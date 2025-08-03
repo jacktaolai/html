@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>南京市森林覆盖率变化（绿色主题）</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        #forest-chart {
+            width: 100%;
+            height: 500px;
+            background-color: #f9fbf8; /* 浅绿色背景 */
+        }
+    </style>
+</head>
+<body>
+    <div id="forest-chart"></div>
+    <script>
+        // 初始化图表
+        const chart = echarts.init(document.getElementById('forest-chart'));
+
+        // 数据（从Sheet2提取）
+        const years = ['2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024'];
+        const regions = {
+            '南京市': [20.38, 21.34, 22.6, 25.81, 24.89, 27.32, 28.25, 28.77, 29.37, 29.56, 29.86, 30.0, 31.15, 31.3, 31.61, 31.9, 31.95, 31.96, 31.96],
+            '浦口区': [32.47, 33.51, 32.9, 35.6, 33.96, 36.48, 37.0, 37.17, 37.56, 37.58, 37.59, 37.61, 42.55, 42.57, 42.7, 42.7, 42.75, 42.75, 42.75],
+            '栖霞区': [21.14, 21.31, 21.41, 27.89, 24.04, 30.77, 31.35, 31.69, 32.01, 32.73, 33.01, 33.17, 32.27, 32.35, 31.91, 31.93, 31.98, 31.99, 32.0],
+            '雨花台区': [21.81, 22.15, 22.95, 26.24, 25.51, 29.16, 30.4, 30.65, 30.97, 30.02, 30.14, 30.18, 31.45, 31.46, 32.07, 32.07, 32.13, 32.15, 32.15],
+            '江宁区': [21.06, 21.91, 23.52, 24.85, 25.26, 26.16, 26.99, 27.67, 28.32, 28.51, 28.76, 28.5, 31.8, 31.85, 31.85, 31.88, 31.89, 31.89, 31.89],
+            '六合区': [16.32, 17.9, 18.93, 21.3, 21.36, 22.97, 23.84, 24.42, 24.88, 25.33, 25.64, 25.82, 24.15, 24.3, 24.79, 25.68, 25.69, 25.69, 25.7],
+            '溧水区': [21.47, 22.36, 25.67, 29.8, 28.03, 31.83, 32.63, 33.48, 34.24, 33.56, 34.17, 34.33, 34.73, 35.01, 35.88, 36.15, 36.16, 36.17, 36.17],
+            '高淳区': [10.35, 11.15, 12.17, 16.96, 17.45, 20.68, 23.01, 23.32, 24.54, 25.56, 26.07, 26.39, 24.46, 24.88, 25.45, 25.81, 26.05, 26.05, 26.05],
+            '城四区': [21.0, 21.09, 21.09, 22.32, 21.44, 22.53, 22.45, 22.58, 22.41, 22.59, 22.37, 24.52, 30.64, 30.67, 30.31, 30.21, 30.31, 30.5, 30.43]
+        };
+
+        // 生成折线系列（绿色系配色）
+        const series = Object.keys(regions).map(region => ({
+            name: region,
+            type: 'line',
+            data: regions[region],
+            smooth: true,
+            symbol: 'circle',
+            symbolSize: 6,
+            lineStyle: { width: 3 },
+            emphasis: { lineStyle: { width: 4 } } // 高亮加粗
+        }));
+
+        // 配置项（绿色主题）
+        const option = {
+            title: {
+                text: '南京市森林覆盖率变化 (2006-2024)',
+                left: 'center',
+                textStyle: { 
+                    fontSize: 18,
+                    color: '#2a5c45' // 深绿色标题
+                }
+            },
+            tooltip: {
+                trigger: 'axis',
+                formatter: params => {
+                    let result = `<b>${params[0].axisValue}年</b><br>`;
+                    params.forEach(param => {
+                        result += `${param.marker} ${param.seriesName}: <b>${param.value}%</b><br>`;
+                    });
+                    return result;
+                },
+                backgroundColor: 'rgba(50, 100, 80, 0.8)', // 深绿色半透明背景
+                borderColor: '#3a7d5a',
+                textStyle: { color: '#fff' }
+            },
+            legend: {
+                data: Object.keys(regions),
+                bottom: 10,
+                type: 'scroll',
+                textStyle: { color: '#2a5c45' }
+            },
+            grid: { 
+                top: '15%', 
+                left: '3%', 
+                right: '4%', 
+                bottom: '15%', 
+                containLabel: true 
+            },
+            xAxis: {
+                type: 'category',
+                data: years,
+                axisLabel: {
+                    interval: 1,
+                    rotate: 45,
+                    fontSize: 10,
+                    color: '#3a7d5a' // 坐标轴标签颜色
+                },
+                axisLine: { lineStyle: { color: '#8cb48a' } },
+                axisTick: { alignWithLabel: true }
+            },
+            yAxis: {
+                type: 'value',
+                name: '森林覆盖率 (%)',
+                nameTextStyle: { color: '#2a5c45' },
+                axisLine: { show: true, lineStyle: { color: '#8cb48a' } },
+                axisLabel: { 
+                    formatter: '{value}%',
+                    color: '#3a7d5a'
+                },
+                splitLine: { lineStyle: { color: '#e0e9df', type: 'dashed' } }
+            },
+            series: series,
+            color: [ // 绿色系配色方案
+                '#1e6f3d', '#3a7d5a', '#4e8d6b', '#6a9c7d', '#8cb48a',
+                '#a5c997', '#b8d3a5', '#c9e0b7', '#d8e8c9'
+            ],
+            backgroundColor: '#f9fbf8' // 图表背景色
+        };
+
+        // 渲染图表
+        chart.setOption(option);
+
+        // 响应式调整
+        window.addEventListener('resize', () => chart.resize());
+    </script>
+</body>
+</html>
